@@ -9,7 +9,7 @@ const Navbar = () => {
                 <Image src="/images/Attendify.png" alt="Attendify" width={100} height={100} className="object-contain" />
             </Link>
 
-            <Link href='sign-in' className={buttonVariants()}>Sign In</Link>
+            <Link href='/sign-in' className={buttonVariants()}>Sign In</Link>
         </div>
     </div>
 }
