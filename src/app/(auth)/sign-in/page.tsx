@@ -10,10 +10,14 @@ const page: FC = () => {
     <div className='absolute inset-0'>
       
         <div className='h-full max-w-2x1 mx-auto flex flex-col items-center justify-center gap-20'>
+<<<<<<< HEAD
           
            
             <Link href='/' className={cn(buttonVariants({variant: 'ghost'}))}>Home</Link>
            
+=======
+        
+>>>>>>> main
             <SignIn />
             
           
