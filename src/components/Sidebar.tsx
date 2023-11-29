@@ -62,4 +62,4 @@ className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snu
     );
 };
 
-export default Sidebar;
+export default Sidebar

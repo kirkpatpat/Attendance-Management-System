@@ -2,7 +2,6 @@ import '@/styles/globals.css'
 import { Inter } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import Navbar from '@/components/Navbar'
-import Sidebar from '@/components/Sidebar'
 
 export const metadata = {
   title: 'Attendify',
@@ -22,7 +21,6 @@ export default function RootLayout({
         <Navbar />
 
         <div className='container max-w-7x1 mx-auto h-full pt-12'>
-          <Sidebar />
           {children}
         </div>
       </body>
