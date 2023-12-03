@@ -5,7 +5,7 @@ import UserAuthForm from './UserAuthForm'
 
 const SignIn: FC  = () => {
   return (
-    <div className='bg-white p-20 rounded-md container mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] '>
+    <div className='container mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] '>
         <div className='flex flex-col space-y-2 text-center'>
             <Image src='/images/tao.png' alt='Attendify' width={100} height={100} className='mx-auto'/>
             <h1 className='text-2x1 font-semibold tracking-tight'>Welcome back!</h1>
