@@ -24,6 +24,7 @@ export default function RootLayout({
         {/* @ts-expects-error server component */}
         <Navbar />
         <Sidebar/>
+     
 
         {authModal}
 
