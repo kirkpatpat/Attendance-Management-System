@@ -57,6 +57,9 @@ module.exports = {
         },
         blue: {
           DEFAULT: '#0000FF'
+        },
+        purple: {
+          DEFAULT: '#4154F1'
         }
       },
       borderRadius: {

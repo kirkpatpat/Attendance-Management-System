@@ -9,7 +9,7 @@ const Sidebar = () => {
                 <div>
                     <Link
                         href="/"
-className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snug w-[260px] h-11 p-2.5 bg-white-50 rounded justify-start items-center gap-2 inline-flex hover:bg-slate-200 hover:text-indigo-600">                    
+                        className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snug w-[260px] h-11 p-2.5 bg-white-50 rounded justify-start items-center gap-2 inline-flex hover:bg-slate-200 hover:text-indigo-600">                    
                         <div className="w-6 h-6 relative">
                             <Image
                                 src="/images/lucide_file-spreadsheet.png"
@@ -20,13 +20,13 @@ className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snu
                             />
                         </div>
                             Attendance
-                       
                     </Link>
+
                     <div className="w-[260px] h-[5px] relative bg-white rounded"></div>
                 </div>
             </div>
 
-         {/* ... REPORT ... */}
+            {/* ... REPORT ... */}
             <div className="flex-col justify-start items-start inline-flex">
                 
                     <Link href = "/"className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snug w-[260px] h-11 p-2.5 bg-white-50 rounded justify-start items-center gap-2 inline-flex hover:bg-slate-200 hover:text-indigo-600">
@@ -40,6 +40,23 @@ className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snu
                             />
                         </div>
                             Report
+                    </Link>
+            </div>
+
+            {/* ... SANCTION ... */}
+            <div className="flex-col justify-start items-start inline-flex">
+                
+                    <Link href = "/sanctionHome"className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snug w-[260px] h-11 p-2.5 bg-white-50 rounded justify-start items-center gap-2 inline-flex hover:bg-slate-200 hover:text-indigo-600">
+                        <div className="w-6 h-6 relative">
+                            <Image
+                                src="/images/carbon_report.png"
+                                alt="Sanction"
+                                width={60}
+                                height={60}
+                                className="w-4 h-5 left-[4px] top-[2px] absolute"
+                            />
+                        </div>
+                            Sanction
                     </Link>
             
                 <div className="w-[260px] h-[300px] relative bg-white rounded"></div>

@@ -4,7 +4,7 @@ import { buttonVariants } from "./ui/Button"
 import { getAuthSession } from "@/lib/auth"
 import UserAccountNav from "./UserAccountNav"
 
-const Navbar = async () => {
+const Navbar: any = async () => {
 
     const session = await getAuthSession()
 
