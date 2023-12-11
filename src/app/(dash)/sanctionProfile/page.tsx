@@ -1,10 +1,7 @@
 import Link from "next/link";
-import SanctionNav from "@/components/sanctionNav";
-import SanctionButton from "@/components/sanctionEventButton";
-import SanctionAdvancedButton from "@/components/sanctionAdvancedButton";
-import SanctionHomeTable from "@/components/sanctionHomeTable";
+import SanctionNavProfile from "@/components/sanctionNavProfile";
 
-export default function sanctionHome() {
+export default function sanctionProfile() {
   return (
     <div>
       <div className="p-8">
@@ -28,36 +25,16 @@ export default function sanctionHome() {
       </div>
 
       <div className="flex justify-center">
-        <h1 className="text-[36px] text-purple font-bold italic">Home</h1>
+        <h1 className="text-[36px] text-purple font-bold italic">Profile</h1>
       </div>
 
       <div
         className="main-container container w-7/12 bg-white rounded-[15px] h-[560px] mt-8 shadow-md p-10"
         style={{ boxShadow: "0 10px 20px rgba(65, 84, 241, 0.35)" }}
       >
-        <div className="flex flex-row justify-between items-center ">
-          <div>
-            <h1 className="text-xl italic text-purple font-bold">
-              Search for students with sanction
-            </h1>
-          </div>
-
-          <div className="space-x-4">
-            <input
-              style={{ backgroundColor: "#EDF1F7" }}
-              className="rounded-full py-3 px-6 text-sm"
-              type="text"
-              id="myInput"
-              placeholder="Type here..."
-            />
-            <SanctionButton />
-            <SanctionAdvancedButton />
-          </div>
-        </div>
-
-        <SanctionHomeTable />
+        <div className="flex flex-row justify-between items-center "></div>
       </div>
-      <SanctionNav />
+      <SanctionNavProfile />
     </div>
   );
 }
