@@ -116,7 +116,12 @@ const Page = () => {
   })}
 
   const exportCSV = () => {
-    const headerRow = Object.keys(filteredData[0]).join(',');
+    // Get selected department and event
+    const selectedDepartment = (document.getElementById('department') as HTMLSelectElement)?.value || 'Department';
+    const selectedEvent = (document.getElementById('event') as HTMLSelectElement)?.value || 'Event';
+    const selectedDate = (document.getElementById('date') as HTMLInputElement)?.value || 'Date';
+  
+    const headerRow = `Department: ${selectedDepartment}, Event: ${selectedEvent}, Date: ${selectedDate}\n${Object.keys(filteredData[0]).join(',')}`;
     const csvRows = [
       headerRow,
       ...filteredData.map(row => {
@@ -139,6 +144,7 @@ const Page = () => {
     document.body.appendChild(link);
     link.click();
   };
+  
  
   return (
   
@@ -235,14 +241,14 @@ const Page = () => {
           <div className="pr-[42px] left-[13px] top-[27px] absolute justify-start items-start inline-flex">
             <input
               type="date"
-              id="event"
+              id="date"
               className="text-neutral-800 text-base font-normal font-open-sans leading-tight w-full h-full border-none outline-none bg-transparent"
             />
           </div>
         </div>
       </div>
       
-      <div className="w-[1136px] bg-white rounded-md border border-black dlex items-centre">
+      <div className="w-[1336px] bg-white rounded-md border border-black dlex items-centre">
         <input
           type="text"
           placeholder="Search..."
@@ -253,37 +259,39 @@ const Page = () => {
       </div>
       {filteredData.length > 0 && (
         <div>
-          <button onClick={exportCSV} style={{ marginTop: '10px' }}>Export CSV</button>
+          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+          <button class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={exportCSV} style={{ marginTop: '10px' }}>Export CSV</button>
+          </div>
           <h2>Student Records</h2>
           
           <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead>
+            <thead class="bg-sky-300 shadow-md ">
               <tr>
                 {Object.keys(filteredData[0]).map((columnName, index) => (
-                  <th key={index}>
+                  <th class="text-neutral-950 " key={index}>
                     <div style={{ cursor: 'pointer' }}>
                       {columnName}
                     </div>
                   </th>
                 ))}
               </tr>
-            </thead>
+            </thead >
             <tbody>
             {filteredData.map((row, filteredIndex) => {
                 const originalIndex = filteredIndices[filteredIndex];
                 return (
-                  <tr key={filteredIndex}>
+                  <tr class="bg-sky-100" key={filteredIndex}>
                     {Object.values(row).map((cell: any, cellIndex) => (
                       <td key={cellIndex} style={{ border: '1px solid #000', padding: '8px' }}>
                         {cell}
                       </td>
                     ))}
                     <td>
-                      <button onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
+                      <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
                     </td>
                     <td></td>
                     <td>
-                      <button onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
+                      <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
                     </td>
                     <td></td>
                   </tr>
