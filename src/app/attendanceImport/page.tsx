@@ -2,7 +2,14 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 
+
+const departments = ["SEAITE", "SABH", "SEAS", "SHAS"];
+const events = ["Foundation", "Intramurals"];
+const years = ["2023", "2024", "2025", "2026", "2027"];
+const days: string[] = [];
+
 const Page = () => {
+  
   const [csvData, setCsvData] = useState<string | null>(null);
   const [tableData, setTableData] = useState<string[][]>([]);
   const [showFileInput, setShowFileInput] = useState(true);
@@ -10,6 +17,7 @@ const Page = () => {
   const [sortByColumn, setSortByColumn] = useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [originalIndices, setOriginalIndices] = useState<number[]>([]);
+ 
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -27,6 +35,7 @@ const Page = () => {
     if (file) {
       reader.readAsText(file);
     }
+      
   };
 
   const parseCSV = (csvContent: string) => {
@@ -131,9 +140,15 @@ const Page = () => {
     document.body.appendChild(link);
     link.click();
   };
-
+ 
   return (
+  
+   
+    
     <div style={{ width: '100%', height: '100%', position: 'relative', background: '#EDF1F7' }}>
+      
+       
+      
       {showFileInput ? (
         <div
           style={{
@@ -150,21 +165,91 @@ const Page = () => {
             display: 'flex',
           }}
         >
-          <div style={{ color: 'white', fontSize: 12, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word' }}>
+      
+         
+          <div style={{ color: 'black', fontSize: 10, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word' }}>
             <form onSubmit={(e) => e.preventDefault()}>
               <input type="file" accept=".csv" onChange={handleFileUpload} />
             </form>
           </div>
         </div>
       ) : null}
-
-      <div>
+     
+       <div className="w-[164px] h-[58px] top-[-13px] relative bg-white rounded-md border border-gray-300">
+          <div className="w-[191.40px] h-[49.30px] pl-[11.05px] pr-[89.35px] pt-[5px] pb-[13px] opacity-60 justify-start items-start flex">
+            <label
+              htmlFor="department"
+              className="text-neutral-700 text-base font-normal font-['Open Sans'] leading-normal"
+            >
+              Department
+            </label>
+          </div>
+          <div className="pr-[42px] left-[13px] top-[27px] absolute justify-start items-start inline-flex">
+            <select
+              id="department"
+              className="text-neutral-800 text-base font-normal font-open-sans leading-tight w-full h-full border-none outline-none bg-transparent"
+            >
+              {departments.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>  
+        
+        <div className="left-[178px] top-[-13px] absolute justify-start items-start inline-flex">
+        <div className="w-[164px] h-[58px] relative bg-white rounded-md border border-gray-300">
+          <div className="w-[142.40px] pl-[11.05px] pr-[89.35px] pt-[5px] pb-[13px] opacity-60 justify-start items-start flex">
+            <label
+              htmlFor="event"
+              className="text-neutral-700 text-base font-normal font-['Open Sans'] leading-normal"
+            >
+              Event
+            </label>
+          </div>
+          <div className="pr-[42px] left-[13px] top-[27px] absolute justify-start items-start inline-flex">
+            <select
+              id="event"
+              className="text-neutral-800 text-base font-normal font-open-sans leading-tight w-full h-full border-none outline-none bg-transparent"
+            >
+              {events.map((event) => (
+                <option key={event} value={event}>
+                  {event}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        </div>
+        
+        <div className="left-[358px] top-[-13px] absolute justify-start items-start inline-flex">
+        <div className="w-[164px] h-[58px] relative bg-white rounded-md border border-gray-300">
+          <div className="w-[142.40px] pl-[11.05px] pr-[89.35px] pt-[5px] pb-[13px] opacity-60 justify-start items-start flex">
+            <label
+              htmlFor="event"
+              className="text-neutral-700 text-base font-normal font-['Open Sans'] leading-normal"
+            >
+              Date
+            </label>
+          </div>
+          <div className="pr-[42px] left-[13px] top-[27px] absolute justify-start items-start inline-flex">
+            <input
+              type="date"
+              id="event"
+              className="text-neutral-800 text-base font-normal font-open-sans leading-tight w-full h-full border-none outline-none bg-transparent"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="w-[1136px] bg-white rounded-md border border-black dlex items-centre">
         <input
           type="text"
           placeholder="Search..."
           value={searchText}
           onChange={handleSearch}
-          style={{ marginBottom: '10px' }}
+          className="w-full h-full border-none outline-none bg-transparent pl-3"
         />
       </div>
       {filteredData.length > 0 && (
@@ -211,6 +296,8 @@ const Page = () => {
       )}
     </div>
   );
+  
 };
 
 export default Page;
+
