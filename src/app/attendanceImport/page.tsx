@@ -5,8 +5,7 @@ import Papa from 'papaparse';
 
 const departments = ["SEAITE", "SABH", "SEAS", "SHAS"];
 const events = ["Foundation", "Intramurals"];
-const years = ["2023", "2024", "2025", "2026", "2027"];
-const days: string[] = [];
+
 
 const Page = () => {
   
