@@ -50,3 +50,62 @@ model User {
   accounts Account[]
   sessions Session[]
 }
+
+model Student {
+  studentId       Int     @id
+  firstname       String  
+  middleInitial   String?
+  lastname        String
+  sex             String
+  program         String
+  yearlvl         Int
+  ifOfficer       Boolean?
+
+  department Department @relation(fields: [deptCode], references: [deptCode])
+  deptCode        String
+  atttendance Attendance[]
+}
+
+model Department {
+  deptCode      String  @id
+  deptName      String
+
+  student Student[]
+}
+
+model Attendance {
+  attendanceId      Int       @id @default(autoincrement())
+  inAM              DateTime 
+  outAM             DateTime
+  inPM              DateTime
+  outPM             DateTime
+  status            String
+
+  student Student @relation(fields: [studentId], references: [studentId])
+  studentId         Int
+  inclusiveDays InclusiveDays @relation(fields: [dayId], references: [dayId])
+  dayId             Int
+}
+
+model InclusiveDays {
+  dayId     Int     @id
+  dayNum    Int     
+  dayName   String
+  date      DateTime
+
+  schoolEvent SchoolEvent @relation(fields: [eventId], references: [eventId])
+  eventId   Int
+
+  attendance Attendance[]
+}
+
+model SchoolEvent {
+  eventId     Int      @id
+  eventName   String
+  eventDate   DateTime
+  EventTime   DateTime
+  location    String
+  Semester    String
+
+  inclusiveDays InclusiveDays[]
+}

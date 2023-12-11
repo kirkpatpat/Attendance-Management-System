@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link";
 import Image from "next/image";
+import { signIn, signOut } from "next-auth/react";
 
 const Sidebar = () => {
     return (
@@ -48,14 +51,18 @@ className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snu
             {/* ... LOGOUT ... */}
             <div className="flex-col justify-start items-start inline-flex">
                 <div>
-                <Link href="/attendance"
-            className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snug w-[260px] h-11 p-2.5 bg-white-50 rounded justify-start items-center gap-2 inline-flex hover:bg-slate-200 hover:text-indigo-600">
-              <div className="w-6 h-6 relative">
-                <Image src="/images/lucide_file-spreadsheet.png" alt="Spreadsheet" width={40} height={50} className="w-4 h-5 left-[4px] top-[2px] absolute" />
-              </div>
-                Logout
-             
-          </Link>
+                    <Link href="/" onClick={(event) => {
+        event.preventDefault()
+        signOut({
+          callbackUrl: `${window.location.origin}/sign-in`
+        })
+      }}
+                        className="text-sky-900 text-[15px] font-semibold font-['Open Sans'] leading-snug w-[260px] h-11 p-2.5 bg-white-50 rounded justify-start items-center gap-2 inline-flex hover:bg-slate-200 hover:text-indigo-600">
+                        <div className="w-6 h-6 relative">
+                            <Image src="/images/lucide_file-spreadsheet.png" alt="Spreadsheet" width={40} height={50} className="w-4 h-5 left-[4px] top-[2px] absolute" />
+                        </div>
+                            Logout                    
+                    </Link>
                 </div>
             </div>
         </div>
