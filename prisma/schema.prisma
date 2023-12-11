@@ -54,12 +54,12 @@ model User {
 model Student {
   studentId       Int     @id
   firstname       String  
-  middleInitial   String
+  middleInitial   String?
   lastname        String
   sex             String
   program         String
   yearlvl         Int
-  ifOfficer       Boolean
+  ifOfficer       Boolean?
 
   department Department @relation(fields: [deptCode], references: [deptCode])
   deptCode        String
