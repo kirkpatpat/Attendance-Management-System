@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Papa from 'papaparse';
 
 
+
 const departments = ["SEAITE", "SABH", "SEAS", "SHAS"];
 const events = ["Foundation", "Intramurals"];
 
@@ -145,6 +146,24 @@ const Page = () => {
     link.click();
   };
   
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleEditClick = () => {
+    setIsEditMode((prevEditMode) => !prevEditMode);
+  };
+
+  const handleCellEdit = (originalIndex, columnName, value) => {
+    setTableData((prevTableData) => {
+      const updatedTableData = [...prevTableData];
+      const dataIndex = originalIndices.indexOf(originalIndex);
+      if (dataIndex !== -1) {
+        const rowToUpdate = { ...updatedTableData[dataIndex] };
+        rowToUpdate[columnName] = value;
+        updatedTableData[dataIndex] = rowToUpdate;
+      }
+      return updatedTableData;
+    });
+  };
  
   return (
   
@@ -259,9 +278,18 @@ const Page = () => {
       </div>
       {filteredData.length > 0 && (
         <div>
-          <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <button class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={exportCSV} style={{ marginTop: '10px' }}>Export CSV</button>
+
+          <div className="flex flex-row justify-end gap-4">
+          <button
+            className={`bg-${isEditMode ? 'green' : 'blue'}-500 hover:bg-${isEditMode ? 'green' : 'blue'}-700 text-white font-bold py-2 px-4 rounded-full`}
+            style={{ marginTop: '10px' }}
+            onClick={handleEditClick}
+          >
+            {isEditMode ? 'SAVE' : 'EDIT'}
+          </button>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={exportCSV} style={{ marginTop: '10px' }}>EXPORT</button>
           </div>
+
           <h2>Student Records</h2>
           
           <table style={{ borderCollapse: 'collapse', width: '100%' }}>
@@ -278,20 +306,28 @@ const Page = () => {
             </thead >
             <tbody>
             {filteredData.map((row, filteredIndex) => {
-                const originalIndex = filteredIndices[filteredIndex];
-                return (
-                  <tr class="bg-sky-100" key={filteredIndex}>
-                    {Object.values(row).map((cell: any, cellIndex) => (
-                      <td key={cellIndex} style={{ border: '1px solid #000', padding: '8px' }}>
-                        {cell}
-                      </td>
+              const originalIndex = filteredIndices[filteredIndex];
+              return (
+                    <tr className="bg-sky-100" key={originalIndex}>
+                      {Object.keys(row).map((columnName, cellIndex) => (
+                        <td key={columnName} style={{ border: '1px solid #000', padding: '8px' }}>
+                          {isEditMode ? (
+                            <input
+                              type="text"
+                              value={row[columnName]}
+                              onChange={(e) => handleCellEdit(originalIndex, columnName, e.target.value)}
+                            />
+                          ) : (
+                            row[columnName]
+                          )}
+                    </td>
                     ))}
                     <td>
-                      <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
+                      <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
                     </td>
                     <td></td>
                     <td>
-                      <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
+                      <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
                     </td>
                     <td></td>
                   </tr>
