@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import Papa from 'papaparse';
+import { now } from 'next-auth/client/_utils';
 
 
 
@@ -17,7 +18,68 @@ const Page = () => {
   const [sortByColumn, setSortByColumn] = useState<number | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [originalIndices, setOriginalIndices] = useState<number[]>([]);
- 
+
+  const [defaultDate, setDefaultDate] = useState<string>('');
+
+  const [selectedDate, setSelectedDate] = useState<string>(''); // State to manage selected date
+
+  useEffect(() => {
+    // Function to format date as YYYY-MM-DD
+    const formatDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = `${date.getMonth() + 1}`.padStart(2, '0');
+      const day = `${date.getDate()}`.padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const today = new Date();
+    const formattedDate = formatDate(today);
+    setSelectedDate(formattedDate); // Set default date to today's date
+  }, []);
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(event.target.value); // Update selected date on user input
+  };
+
+    // Initialize default time values (in HHmm format)
+    const defaultCallTimeAmIn = 830;
+    const defaultCallTimeAmOut = 1130;
+    const defaultCallTimePmIn = 1330;
+    const defaultCallTimePmOut = 1730;
+  
+    // Use the useState hook to set the default time values
+    const [callTimeAmIn, setCallTimeAmIn] = useState<number>(defaultCallTimeAmIn);
+    const [callTimeAmOut, setCallTimeAmOut] = useState<number>(defaultCallTimeAmOut);
+    const [callTimePmIn, setCallTimePmIn] = useState<number>(defaultCallTimePmIn);
+    const [callTimePmOut, setCallTimePmOut] = useState<number>(defaultCallTimePmOut);
+  
+    // Function to format time from number to HH:mm string
+    const formatTime = (time: number): string => {
+      const hours = Math.floor(time / 100).toString().padStart(2, '0');
+      const minutes = (time % 100).toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+  
+    // Effect to update time inputs when default time values change
+    useEffect(() => {
+      setCallTimeAmIn(defaultCallTimeAmIn);
+      setCallTimeAmOut(defaultCallTimeAmOut);
+      setCallTimePmIn(defaultCallTimePmIn);
+      setCallTimePmOut(defaultCallTimePmOut);
+    }, [defaultCallTimeAmIn, defaultCallTimeAmOut, defaultCallTimePmIn, defaultCallTimePmOut]);
+  
+
+  const handleTimeInputChange = (event: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<number>>) => {
+    const inputValue = event.target.value;
+    const parsedTime = parseTimeTo24Hour(inputValue);
+    setter(parsedTime);
+  };
+  
+  const parseTimeTo24Hour = (time: string): number => {
+    const [hours, minutes] = time.split(':').map((part) => parseInt(part, 10));
+    return hours * 100 + minutes;
+  };
+
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,13 +104,42 @@ const Page = () => {
     Papa.parse<string[]>(csvContent, {
       complete: (result) => {
         if (result.data && result.data.length > 0) {
-          setTableData(result.data);
-          setOriginalIndices(result.data.map((_, index) => index));
+          // Filter out empty rows and remove trailing empty rows
+          const nonEmptyRows = result.data.filter(row => row && row.length > 0);
+          while (nonEmptyRows.length > 0 && nonEmptyRows[nonEmptyRows.length - 1].every(cell => !cell)) {
+            nonEmptyRows.pop();
+          }
+  
+          if (nonEmptyRows.length > 0) {
+            const headerRow = nonEmptyRows[0]; // Extract header row
+            const dataRows = nonEmptyRows.slice(1); // Extract data rows
+  
+            const initialTableData = dataRows.map((row) => {
+              // Create an object with header keys and row values
+              const rowData: { [key: string]: string } = {};
+              headerRow.forEach((header, index) => {
+                rowData[header] = row[index] || ''; // Assign row values to corresponding headers
+              });
+              // Set default values for time columns if needed
+              rowData['Morning Time-In'] = '';
+              rowData['Morning Time-Out'] = '';
+              rowData['Afternoon Time-In'] = '';
+              rowData['Afternoon Time-Out'] = '';
+              return rowData;
+            });
+  
+            setTableData(initialTableData);
+            setOriginalIndices(initialTableData.map((_, index) => index));
+          }
         }
       },
-      header: true, // Assume the CSV file contains header row
+      header: false, // No header to be parsed, handled manually
     });
   };
+  
+  
+  
+  
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -56,47 +147,67 @@ const Page = () => {
 
   const recordTime = (originalIndex: number, type: string) => {
     const now = new Date();
-    const hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const time = `${hours}:${minutes}`;
+    const nowHours = now.getHours();
+    const nowMinutes = now.getMinutes();
+  
+    // Ensure minutes are formatted correctly
+    const minutes = String(nowMinutes).padStart(2, '0');
+  
+    // Format the time as HH:MM
+    const time = `${nowHours}:${minutes}`;
+  
+    // Calculate hours based on a numeric representation of time
+    const hours = parseInt(`${nowHours.toString().padStart(2, '0')}${minutes}`, 10);
   
     const dataIndex = originalIndices.indexOf(originalIndex);
     if (dataIndex !== -1) {
-      setTableData((prevTableData) => {
-        const updatedTableData = [...prevTableData];
-        const rowToUpdate = updatedTableData[dataIndex];
-  
-        if (rowToUpdate) {
-          if (type === 'timeIn') {
-            if (hours < 12) {
-              rowToUpdate['Morning Time-In'] = time;
-            } else {
-              if (!rowToUpdate['Morning Time-In']) {
-                rowToUpdate['Morning Time-In'] = 'Absent';
-                rowToUpdate['Morning Time-Out'] = 'Absent';
-              }
-  
-              rowToUpdate['Afternoon Time-In'] = time;
-            }
-          } else if (type === 'timeOut') {
-            if (hours < 12) {
-              rowToUpdate['Morning Time-Out'] = time;
-            } else {
-              if (!rowToUpdate['Afternoon Time-In']) {
-                rowToUpdate['Morning Time-In'] = 'Absent';
-                rowToUpdate['Morning Time-Out'] = 'Absent';
-                rowToUpdate['Afternoon Time-In'] = 'Absent';
-              }
-  
-              rowToUpdate['Afternoon Time-Out'] = time;
-            }
+     setTableData((prevTableData) => {
+    const updatedTableData = [...prevTableData];
+    const rowToUpdate = updatedTableData[dataIndex];
+
+    if (rowToUpdate) {
+      switch (type) {
+        case 'timeIn':
+          if (hours < callTimeAmIn && hours < 1200) {
+            rowToUpdate['Morning Time-In'] = time;
+            console.log(callTimeAmIn);
+          } else if (hours > callTimeAmIn && hours < 1200) {
+            rowToUpdate['Morning Time-In'] = 'Absent';
+
+          } else if (hours < callTimePmIn && hours > 1200) {
+            rowToUpdate['Afternoon Time-In'] = time;
+          
+          }else if(hours > callTimePmIn){
+            rowToUpdate['Afternoon Time-In'] = 'Absent';
           }
-        }
-  
-        return updatedTableData;
-      });
+
+          break;
+    
+        case 'timeOut':
+          if (hours < callTimeAmOut && hours < 1200) {
+            rowToUpdate['Morning Time-Out'] = time;
+          
+          } else if (hours < 1200 && hours > callTimeAmOut) {
+            rowToUpdate['Morning Time-Out'] = 'Absent';
+          
+          } else if (hours < callTimePmOut && hours > 1200) {
+            
+            rowToUpdate['Afternoon Time-Out'] = time;
+          
+          }else if(hours> callTimePmOut && hours > 1200){
+            rowToUpdate['Afternoon Time-Out'] = 'Absent';
+
+          }
+          break;
+    
+        default:
+          break;
+      }
     }
-  };
+    return updatedTableData;
+          });
+        }
+    };
 
   const filteredIndices = originalIndices.filter((index) =>
   Object.values(tableData[index]).some((cell: any) =>
@@ -123,21 +234,22 @@ const Page = () => {
     const selectedDate = (document.getElementById('date') as HTMLInputElement)?.value || 'Date';
   
     const headerRow = `Department: ${selectedDepartment}, Event: ${selectedEvent}, Date: ${selectedDate}\n${Object.keys(filteredData[0]).join(',')}`;
-    const csvRows = [
-      headerRow,
-      ...filteredData.map(row => {
-        // Check for time in and time out, mark as 'Absent' if not present
-        if (!row['Morning Time-In'] || !row['Morning Time-Out'] || !row['Afternoon Time-In'] || !row['Afternoon Time-Out']) {
-          row['Morning Time-In'] = 'Absent';
-          row['Morning Time-Out'] = 'Absent';
-          row['Afternoon Time-In'] = 'Absent';
-          row['Afternoon Time-Out'] = 'Absent';
-        }
-        return Object.values(row).join(',');
-      })
-    ];
   
-    const csvContent = csvRows.join('\n');
+    const csvRows = filteredData.map(row => {
+      const rowData = Object.assign({}, row); // Create a copy of the row data
+  
+      // Check for empty values in time columns and replace them with 'Absent'
+      if (!rowData['Morning Time-In'] || !rowData['Morning Time-Out'] || !rowData['Afternoon Time-In'] || !rowData['Afternoon Time-Out']) {
+        rowData['Morning Time-In'] = rowData['Morning Time-In'] || 'Absent';
+        rowData['Morning Time-Out'] = rowData['Morning Time-Out'] || 'Absent';
+        rowData['Afternoon Time-In'] = rowData['Afternoon Time-In'] || 'Absent';
+        rowData['Afternoon Time-Out'] = rowData['Afternoon Time-Out'] || 'Absent';
+      }
+  
+      return Object.values(rowData).join(',');
+    });
+  
+    const csvContent = `${headerRow}\n${csvRows.join('\n')}`;
     const encodedUri = encodeURI(`data:text/csv;charset=utf-8,${csvContent}`);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -145,6 +257,8 @@ const Page = () => {
     document.body.appendChild(link);
     link.click();
   };
+  
+  
   
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -261,6 +375,9 @@ const Page = () => {
             <input
               type="date"
               id="date"
+              value={defaultDate}
+              value={selectedDate} // Set the selected date value here
+              onChange={handleDateChange} // Update selected date on user input
               className="text-neutral-800 text-base font-normal font-open-sans leading-tight w-full h-full border-none outline-none bg-transparent"
             />
           </div>
@@ -278,63 +395,126 @@ const Page = () => {
       </div>
       {filteredData.length > 0 && (
         <div>
-
+        
           <div className="flex flex-row justify-end gap-4">
-          <button
-            className={`bg-${isEditMode ? 'green' : 'blue'}-500 hover:bg-${isEditMode ? 'green' : 'blue'}-700 text-white font-bold py-2 px-4 rounded-full`}
-            style={{ marginTop: '10px' }}
-            onClick={handleEditClick}
-          >
-            {isEditMode ? 'SAVE' : 'EDIT'}
-          </button>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={exportCSV} style={{ marginTop: '10px' }}>EXPORT</button>
+            <button
+              className={`bg-${isEditMode ? 'blue' : 'blue'}-500 hover:bg-${isEditMode ? 'green' : 'blue'}-700 text-white font-bold py-2 px-4 rounded-full`}
+              style={{ marginTop: '10px', color:'white' }}
+              onClick={handleEditClick}
+            >
+              {isEditMode ? 'SAVE' : 'EDIT'}
+            </button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={exportCSV} style={{ marginTop: '10px' }}>EXPORT</button>
+          </div>
+
+          <div className="flex flex-row justify-start gap-4">
+            <div className="flex flex-col items-center my-1">
+            <label htmlFor="">Call Time AM-IN</label>
+                <input
+                type="time"
+                id="callTimeAmInInput"
+                name="callTimeAmInInput"
+                className="appearance-none border rounded-md py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-blue-500 hover:bg-blue-700 font-bold py-2 px-4 rounded-full"
+                value={formatTime(callTimeAmIn)} // Use the formatTime function to display the default values
+                onChange={(e) => handleTimeInputChange(e, setCallTimeAmIn)}
+              />
+            </div>
+            <div className="flex flex-col items-center my-1">
+            <label htmlFor="">Call Time AM-OUT</label>
+            <input
+              type="time"
+              id="timeInput"
+              name="timeInput"
+              className="appearance-none border rounded-md py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-blue-500 hover:bg-blue-700  font-bold py-2 px-4 rounded-full e"
+              value={formatTime(callTimeAmOut)} // Use the formatTime function to display the default values
+              onChange={(e) => handleTimeInputChange(e, setCallTimeAmOut)}
+            />
+            </div>
+            <div className="flex flex-col items-center my-1">
+            <label htmlFor="">Call Time PM-IN</label>
+            <input
+              type="time"
+              id="timeInput"
+              name="timeInput"
+              className="appearance-none border rounded-md py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-blue-500 hover:bg-blue-700  font-bold py-2 px-4 rounded-full e"
+              value={formatTime(callTimePmIn)} // Use the formatTime function to display the default values
+              onChange={(e) => handleTimeInputChange(e, setCallTimePmIn)}
+            />
+            </div>
+            <div className="flex flex-col items-center my-1">
+            <label htmlFor="">Call Time PM-OUT</label>
+            <input
+              type="time"
+              id="timeInput"
+              name="timeInput"
+              className="appearance-none border rounded-md py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline bg-blue-500 hover:bg-blue-700  font-bold py-2 px-4 rounded-full e"
+              value={formatTime(callTimePmOut)} // Use the formatTime function to display the default values
+              onChange={(e) => handleTimeInputChange(e, setCallTimePmOut)}
+            />
+            </div>
           </div>
 
           <h2>Student Records</h2>
-          
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead class="bg-sky-300 shadow-md ">
-              <tr>
-                {Object.keys(filteredData[0]).map((columnName, index) => (
-                  <th class="text-neutral-950 " key={index}>
-                    <div style={{ cursor: 'pointer' }}>
-                      {columnName}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead >
-            <tbody>
-            {filteredData.map((row, filteredIndex) => {
-              const originalIndex = filteredIndices[filteredIndex];
-              return (
+       
+         
+            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+            <colgroup>
+              {/* Specify fixed widths for each column */}
+              {Object.keys(filteredData[0]).map((_, index) => (
+                <col key={index} style={{ width: '190px' }} />
+              ))}
+              {/* Additional columns for buttons */}
+              <col style={{ width: '100px' }} />
+              <col style={{ width: '50px' }} />
+              <col style={{ width: '100px' }} />
+              <col style={{ width: '50px' }} />
+            </colgroup>
+              <thead class="bg-sky-300 shadow-md ">
+                <tr>
+                  {Object.keys(filteredData[0]).map((columnName, index) => (
+                    <th class="text-neutral-950 " key={index}>
+                      <div style={{ cursor: 'pointer' }}>
+                        {columnName}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead >
+              <tbody>
+                {filteredData.map((row, filteredIndex) => {
+                  const originalIndex = filteredIndices[filteredIndex];
+                  return (
                     <tr className="bg-sky-100" key={originalIndex}>
                       {Object.keys(row).map((columnName, cellIndex) => (
                         <td key={columnName} style={{ border: '1px solid #000', padding: '8px' }}>
+                          {/* Conditionally render input or plain text based on edit mode */}
                           {isEditMode ? (
                             <input
                               type="text"
                               value={row[columnName]}
                               onChange={(e) => handleCellEdit(originalIndex, columnName, e.target.value)}
+                              style={{ width: '100%' }} // Ensure input width is 100% of its container
                             />
                           ) : (
                             row[columnName]
                           )}
-                    </td>
-                    ))}
-                    <td>
-                      <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
-                    </td>
-                    <td></td>
-                    <td>
-                      <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
-                    </td>
-                    <td></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                        </td>
+                      ))}
+                      {/* Buttons for time-in and time-out */}
+                      <td>
+                        <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
+                      </td>
+                      <td></td>
+                      <td>
+                        <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
+                      </td>
+                      <td></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          
         </div>
       )}
     </div>
