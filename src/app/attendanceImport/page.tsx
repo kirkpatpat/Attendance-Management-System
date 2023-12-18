@@ -5,8 +5,8 @@ import { now } from 'next-auth/client/_utils';
 
 
 
-const departments = ["SEAITE", "SABH", "SEAS", "SHAS"];
-const events = ["Foundation", "Intramurals"];
+const departments = ["SEAITE", "SABH", "SEAS", "SHAS", "BsEd"];
+const events = ["Foundation", "Intramurals", "SEAITE Week", "SABH Week", "SEAS Week", "SHAS Week"];
 
 
 const Page = () => {
@@ -289,12 +289,13 @@ const Page = () => {
       
       {showFileInput ? (
         <div
+          className="items-center justify-center"
           style={{
             width: 171,
             height: 37,
             padding: 10,
-            left: 749,
-            top: 541,
+            left: 560,
+            top: 300,
             position: 'absolute',
             background: '#0000FF',
             borderRadius: 6,
@@ -305,7 +306,7 @@ const Page = () => {
         >
       
          
-          <div style={{ color: 'black', fontSize: 10, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word' }}>
+          <div  style={{ color: 'black', fontSize: 10, fontFamily: 'Inter', fontWeight: '700', wordWrap: 'break-word' }}>
             <form onSubmit={(e) => e.preventDefault()}>
               <input type="file" accept=".csv" onChange={handleFileUpload} />
             </form>
