@@ -2,6 +2,7 @@ import '@/styles/globals.css'
 import { Inter } from 'next/font/google'
 import { cn } from '@/lib/utils'
 import Navbar from '@/components/Navbar'
+import  Sidebar  from '@/components/Sidebar'
 
 export const metadata = {
   title: 'Attendify',
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className='min-h-screen pt-12 bg-default-bg antialiased'>
         {/* @ts-expects-error server component */}
         <Navbar />
+      
 
         {authModal}
 
