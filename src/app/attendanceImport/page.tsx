@@ -374,7 +374,7 @@ const Page = () => {
             <input
               type="date"
               id="date"
-              value={defaultDate}
+              //value={defaultDate}
               value={selectedDate} // Set the selected date value here
               onChange={handleDateChange} // Update selected date on user input
               className="text-neutral-800 text-base font-normal font-open-sans leading-tight w-full h-full border-none outline-none bg-transparent"
