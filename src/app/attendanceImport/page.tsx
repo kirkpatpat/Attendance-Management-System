@@ -15,8 +15,6 @@ const Page = () => {
   const [tableData, setTableData] = useState<string[][]>([]);
   const [showFileInput, setShowFileInput] = useState(true);
   const [searchText, setSearchText] = useState('');
-  const [sortByColumn, setSortByColumn] = useState<number | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [originalIndices, setOriginalIndices] = useState<number[]>([]);
 
   const [defaultDate, setDefaultDate] = useState<string>('');
