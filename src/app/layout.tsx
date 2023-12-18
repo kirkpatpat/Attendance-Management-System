@@ -23,8 +23,7 @@ export default function RootLayout({
       <body className='min-h-screen pt-12 bg-default-bg antialiased'>
         {/* @ts-expects-error server component */}
         <Navbar />
-        <Sidebar/>
-     
+      
 
         {authModal}
 
