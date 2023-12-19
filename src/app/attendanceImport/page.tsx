@@ -452,10 +452,6 @@ const Page = () => {
             />
             </div>
           </div>
-
-          <h2>Student Records</h2>
-       
-         
             <table className='border-collapse w-100'>
             <colgroup>
               {/* Specify fixed widths for each column */}
