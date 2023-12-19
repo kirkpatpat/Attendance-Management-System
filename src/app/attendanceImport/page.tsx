@@ -1,21 +1,30 @@
 "use client";
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import { now } from 'next-auth/client/_utils';
 
-
+type RowData = {
+  'Morning Time-In': string;
+  'Morning Time-Out': string;
+  'Afternoon Time-In': string;
+  'Afternoon Time-Out': string;
+  'Student ID': string;
+  'First Name': string;
+  'Last Name': string;
+  'Course': string;
+  'Year': string;
+};
 
 const departments = ["SEAITE", "SABH", "SEAS", "SHAS", "BsEd"];
 const events = ["Foundation", "Intramurals", "SEAITE Week", "SABH Week", "SEAS Week", "SHAS Week"];
 
 
 const Page = () => {
-  
   const [csvData, setCsvData] = useState<string | null>(null);
-  const [tableData, setTableData] = useState<string[][]>([]);
+  const [tableData, setTableData] = useState<RowData[]>([]);
   const [showFileInput, setShowFileInput] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [originalIndices, setOriginalIndices] = useState<number[]>([]);
+
 
   const [defaultDate, setDefaultDate] = useState<string>('');
 
@@ -102,38 +111,39 @@ const Page = () => {
     Papa.parse<string[]>(csvContent, {
       complete: (result) => {
         if (result.data && result.data.length > 0) {
-          // Filter out empty rows and remove trailing empty rows
           const nonEmptyRows = result.data.filter(row => row && row.length > 0);
+
           while (nonEmptyRows.length > 0 && nonEmptyRows[nonEmptyRows.length - 1].every(cell => !cell)) {
             nonEmptyRows.pop();
           }
   
           if (nonEmptyRows.length > 0) {
-            const headerRow = nonEmptyRows[0]; // Extract header row
-            const dataRows = nonEmptyRows.slice(1); // Extract data rows
-  
-            const initialTableData = dataRows.map((row) => {
-              // Create an object with header keys and row values
-              const rowData: { [key: string]: string } = {};
-              headerRow.forEach((header, index) => {
-                rowData[header] = row[index] || ''; // Assign row values to corresponding headers
-              });
-              // Set default values for time columns if needed
-              rowData['Morning Time-In'] = '';
-              rowData['Morning Time-Out'] = '';
-              rowData['Afternoon Time-In'] = '';
-              rowData['Afternoon Time-Out'] = '';
-              return rowData;
-            });
-  
-            setTableData(initialTableData);
-            setOriginalIndices(initialTableData.map((_, index) => index));
-          }
+          const headerRow = nonEmptyRows[0]; // Extract header row
+          const dataRows = nonEmptyRows.slice(1); // Extract data rows
+
+          const initialTableData: RowData[] = dataRows.map((row) => {
+            const rowData: RowData = {
+              'Student ID': row[0] || '',
+              'First Name': row[1] || '',
+              'Last Name':  row[2] || '',
+              'Course':     row[3] || '',
+              'Year':       row[4] || '',
+              'Morning Time-In': row[5] || '',
+              'Morning Time-Out': row[6] || '',
+              'Afternoon Time-In': row[7] || '',
+              'Afternoon Time-Out': row[8] || ''
+            };
+            return rowData;
+          });
+
+          setTableData(initialTableData);
+          setOriginalIndices(Array.from({ length: initialTableData.length }, (_, index) => index));
         }
-      },
-      header: false, // No header to be parsed, handled manually
-    });
-  };
+      }
+    },
+    header: false,
+  });
+};
   
   
   
@@ -168,7 +178,7 @@ const Page = () => {
         case 'timeIn':
           if (hours < callTimeAmIn && hours < 1200) {
             rowToUpdate['Morning Time-In'] = time;
-            console.log(callTimeAmIn);
+           
           } else if (hours > callTimeAmIn && hours < 1200) {
             rowToUpdate['Morning Time-In'] = 'Absent';
 
@@ -264,7 +274,7 @@ const Page = () => {
     setIsEditMode((prevEditMode) => !prevEditMode);
   };
 
-  const handleCellEdit = (originalIndex, columnName, value) => {
+  const handleCellEdit = (originalIndex: number, columnName: keyof RowData, value: string) => {
     setTableData((prevTableData) => {
       const updatedTableData = [...prevTableData];
       const dataIndex = originalIndices.indexOf(originalIndex);
@@ -276,6 +286,7 @@ const Page = () => {
       return updatedTableData;
     });
   };
+  
  
   return (
   
@@ -476,23 +487,23 @@ const Page = () => {
                 </tr>
               </thead >
               <tbody className='text-center'>
-                {filteredData.map((row, filteredIndex) => {
-                  const originalIndex = filteredIndices[filteredIndex];
-                  return (
-                    <tr key={originalIndex}>
-                      {Object.keys(row).map((columnName) => (
-                        <td key={columnName} className="bg-sky-100 border-b dark:border-gray-700" style={{  padding: '8px' }}>
-                          {/* Conditionally render input or plain text based on edit mode */}
-                          {isEditMode ? (
-                            <input
-                              type="text"
-                              value={row[columnName]}
-                              onChange={(e) => handleCellEdit(originalIndex, columnName, e.target.value)}
-                              style={{ width: '100%' }} // Ensure input width is 100% of its container
-                            />
-                          ) : (
-                            row[columnName]
-                          )}
+              {filteredData.map((row, filteredIndex) => {
+                const originalIndex = filteredIndices[filteredIndex];
+                return (
+                  <tr key={originalIndex}>
+                    {Object.keys(row).map((columnName) => (
+                      <td key={columnName} className="bg-sky-100 border-b dark:border-gray-700" style={{  padding: '8px' }}>
+                        {/* Conditionally render input or plain text based on edit mode */}
+                        {isEditMode ? (
+                          <input
+                            type="text"
+                            value={row[columnName as keyof RowData]} // Assert columnName as keyof RowData
+                            onChange={(e) => handleCellEdit(originalIndex, columnName as keyof RowData, e.target.value)} // Assert columnName as keyof RowData
+                            style={{ width: '100%' }}
+                          />
+                        ) : (
+                          row[columnName as keyof RowData] // Assert columnName as keyof RowData
+                        )}
                         </td>
                       ))}
                       {/* Buttons for time-in and time-out */}
