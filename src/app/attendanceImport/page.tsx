@@ -456,7 +456,7 @@ const Page = () => {
           <h2>Student Records</h2>
        
          
-            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+            <table className='border-collapse w-100'>
             <colgroup>
               {/* Specify fixed widths for each column */}
               {Object.keys(filteredData[0]).map((_, index) => (
@@ -468,10 +468,10 @@ const Page = () => {
               <col style={{ width: '100px' }} />
               <col style={{ width: '50px' }} />
             </colgroup>
-              <thead class="bg-sky-300 shadow-md ">
+              <thead className="bg-sky-300">
                 <tr>
                   {Object.keys(filteredData[0]).map((columnName, index) => (
-                    <th class="text-neutral-950 " key={index}>
+                    <th className="text-neutral-950 " key={index}>
                       <div style={{ cursor: 'pointer' }}>
                         {columnName}
                       </div>
@@ -479,13 +479,13 @@ const Page = () => {
                   ))}
                 </tr>
               </thead >
-              <tbody>
+              <tbody className='text-center'>
                 {filteredData.map((row, filteredIndex) => {
                   const originalIndex = filteredIndices[filteredIndex];
                   return (
-                    <tr className="bg-sky-100" key={originalIndex}>
-                      {Object.keys(row).map((columnName, cellIndex) => (
-                        <td key={columnName} style={{ border: '1px solid #000', padding: '8px' }}>
+                    <tr key={originalIndex}>
+                      {Object.keys(row).map((columnName) => (
+                        <td key={columnName} className="bg-sky-100 border-b dark:border-gray-700" style={{  padding: '8px' }}>
                           {/* Conditionally render input or plain text based on edit mode */}
                           {isEditMode ? (
                             <input
@@ -501,11 +501,11 @@ const Page = () => {
                       ))}
                       {/* Buttons for time-in and time-out */}
                       <td>
-                        <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
+                        <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded w-max" onClick={() => recordTime(originalIndex, 'timeIn')}>Time-In</button>
                       </td>
                       <td></td>
                       <td>
-                        <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
+                        <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded w-max" onClick={() => recordTime(originalIndex, 'timeOut')}>Time-Out</button>
                       </td>
                       <td></td>
                     </tr>
