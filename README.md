@@ -28,6 +28,9 @@ An Attendance Management System that uses the Next.js web development framework.
 * Kian Macamos
 * Church Chill Parco
 
+## Check the deployed program here:
+
+* https://attendance-management-system-psi.vercel.app/
 
 ## License
 
